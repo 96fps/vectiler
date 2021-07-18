@@ -157,8 +157,8 @@ float sampleElevation(glm::vec2 position, const std::unique_ptr<HeightData>& tex
     }
 
     // Normalize vertex coordinates into the texture coordinates range
-    float u = (position.x * 0.5f + 0.5f) * textureData->width;
-    float v = (position.y * 0.5f + 0.5f) * textureData->height;
+    float u = (position.x * 0.5f + 0.5f) * (textureData->width  - 4);
+    float v = (position.y * 0.5f + 0.5f) * (textureData->height - 4);
 
     // Flip v coordinate according to tile coordinates
     v = textureData->height - v;
@@ -166,16 +166,21 @@ float sampleElevation(glm::vec2 position, const std::unique_ptr<HeightData>& tex
     float alpha = u - floor(u);
     float beta  = v - floor(v);
 
-    int ii0 = floor(u);
-    int jj0 = floor(v);
-    int ii1 = ii0 + 1;
-    int jj1 = jj0 + 1;
+    int ii0 = floor(u) + 2;
+    int jj0 = floor(v) - 2;
+    int ii1 = ii0 + 1  + 2;
+    int jj1 = jj0 + 1  - 2;
 
     // Clamp on borders
-    ii0 = std::min(ii0, textureData->width - 1);
-    jj0 = std::min(jj0, textureData->height -1);
-    ii1 = std::min(ii1, textureData->width - 1);
-    jj1 = std::min(jj1, textureData->height - 1);
+    ii0 = std::min(ii0, textureData->width  - 1 - 2);
+    jj0 = std::min(jj0, textureData->height - 1 - 2);
+    ii1 = std::min(ii1, textureData->width  - 1 - 2);
+    jj1 = std::min(jj1, textureData->height - 1 - 2);
+
+    ii0 = std::max(ii0, 2);
+    jj0 = std::max(jj0, 2);
+    ii1 = std::max(ii1, 2);
+    jj1 = std::max(jj1, 2);
 
     // Sample four corners of the current texel
     float s0 = textureData->elevation[ii0][jj0];
